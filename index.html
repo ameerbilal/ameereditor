@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="ameer.js">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Client Records</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #4CAF50; color: white; }
+        button { margin-top: 10px; padding: 10px; }
+    </style>
+</head>
+<body>
+
+    <h2>Client Records</h2>
+    
+    <input type="text" id="client-name" placeholder="Client Name">
+    <input type="text" id="order" placeholder="Order">
+    <input type="date" id="delivery-date">
+    <input type="number" id="amount" placeholder="Amount (JOD)">
+    <button onclick="addClient()">Add Client</button>
+    <button onclick="clearAll()">Clear All</button>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Order</th>
+                <th>Delivery Date</th>
+                <th>Amount (JOD)</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody id="client-list"></tbody>
+    </table>
+
+    <script>
+        function loadClients() {
+            const clientList = document.getElementById('client-list');
+            clientList.innerHTML = '';
+
+            let clients = JSON.parse(localStorage.getItem('clients')) || [];
+
+            clients.forEach((client, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${client.name}</td>
+                    <td>${client.order}</td>
+                    <td>${client.date}</td>
+                    <td>${client.amount} JOD</td>
+                    <td><button onclick="deleteClient(${index})">Delete</button></td>
+                `;
+                clientList.appendChild(row);
+            });
+        }
+
+        function addClient() {
+            const name = document.getElementById('client-name').value.trim();
+            const order = document.getElementById('order').value.trim();
+            const date = document.getElementById('delivery-date').value;
+            const amount = document.getElementById('amount').value.trim();
+
+            if (name && order && date && amount) {
+                let clients = JSON.parse(localStorage.getItem('clients')) || [];
+                clients.push({ name, order, date, amount });
+                localStorage.setItem('clients', JSON.stringify(clients));
+
+                document.getElementById('client-name').value = '';
+                document.getElementById('order').value = '';
+                document.getElementById('delivery-date').value = '';
+                document.getElementById('amount').value = '';
+
+                loadClients();
+            } else {
+                alert('Please fill in all fields.');
+            }
+        }
+
+        function deleteClient(index) {
+            let clients = JSON.parse(localStorage.getItem('clients')) || [];
+            clients.splice(index, 1);
+            localStorage.setItem('clients', JSON.stringify(clients));
+            loadClients();
+        }
+
+        function clearAll() {
+            if (confirm("Are you sure you want to clear all records?")) {
+                localStorage.removeItem('clients');
+                loadClients();
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', loadClients);
+    </script>
+
+</body>
+</html>
